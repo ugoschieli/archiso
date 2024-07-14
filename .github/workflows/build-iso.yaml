@@ -1,0 +1,24 @@
+name: Build Iso
+on: [ push ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+      options: --privileged
+    steps:
+      - name: Setup Pacman key
+        run: |
+          pacman-key --init
+          pacman -Syy --noconfirm archlinux-keyring
+      - name: Install mkarchiso
+        run: |
+          pacman -S --noconfirm archiso
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+      - name: Build Iso
+        run : mkarchiso -v archiso
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/archlinux*
